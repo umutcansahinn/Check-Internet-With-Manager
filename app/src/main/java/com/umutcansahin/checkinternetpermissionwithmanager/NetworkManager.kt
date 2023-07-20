@@ -52,9 +52,9 @@ class NetworkManager @Inject constructor(
 
     private fun checkNetworkConnectivity() {
         val network = connectivityManager.activeNetwork
-//        if (network == null) {
-//            postValue(false)
-//        }
+        if (network == null) {
+            postValue(Status.Unavailable)
+        }
         val requestBuilder = NetworkRequest.Builder().apply {
             addCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED)
             addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
