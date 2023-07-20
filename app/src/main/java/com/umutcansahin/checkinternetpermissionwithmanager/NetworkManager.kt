@@ -6,8 +6,18 @@ import android.net.Network
 import android.net.NetworkCapabilities
 import android.net.NetworkRequest
 import androidx.lifecycle.LiveData
+import dagger.hilt.android.qualifiers.ApplicationContext
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class NetworkManager(context: Context) : LiveData<Boolean>() {
+enum class Status {
+    Available, Unavailable, Lost
+}
+
+@Singleton
+class NetworkManager @Inject constructor(
+    @ApplicationContext context: Context
+) : LiveData<Status>() {
 
 
     override fun onActive() {
@@ -26,25 +36,25 @@ class NetworkManager(context: Context) : LiveData<Boolean>() {
     private val networkCallback = object : ConnectivityManager.NetworkCallback() {
         override fun onAvailable(network: Network) {
             super.onAvailable(network)
-            postValue(true)
+            postValue(Status.Available)
         }
 
         override fun onUnavailable() {
             super.onUnavailable()
-            postValue(false)
+            postValue(Status.Unavailable)
         }
 
         override fun onLost(network: Network) {
             super.onLost(network)
-            postValue(false)
+            postValue(Status.Lost)
         }
     }
 
     private fun checkNetworkConnectivity() {
         val network = connectivityManager.activeNetwork
-        if (network == null) {
-            postValue(false)
-        }
+//        if (network == null) {
+//            postValue(false)
+//        }
         val requestBuilder = NetworkRequest.Builder().apply {
             addCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED)
             addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
